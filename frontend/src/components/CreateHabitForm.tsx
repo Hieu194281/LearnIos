@@ -22,7 +22,7 @@ interface CreateHabitFormProps {
 export default function CreateHabitForm({ onHabitCreated }: CreateHabitFormProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const frequency = Form.useWatch("frequency", form);
+  const [frequency, setFrequency] = useState<"daily" | "custom">("daily");
 
   const onFinish = async (values: { name: string; frequency: "daily" | "custom"; days?: string[] }) => {
     setLoading(true);
@@ -34,6 +34,7 @@ export default function CreateHabitForm({ onHabitCreated }: CreateHabitFormProps
       });
       onHabitCreated(habit);
       form.resetFields();
+      setFrequency("daily");
       message.success("Habit created!");
     } catch (err) {
       message.error(err instanceof Error ? err.message : "Failed to create habit");
@@ -48,6 +49,9 @@ export default function CreateHabitForm({ onHabitCreated }: CreateHabitFormProps
       layout="vertical"
       onFinish={onFinish}
       initialValues={{ frequency: "daily", days: [] }}
+      onValuesChange={(changed) => {
+        if (changed.frequency) setFrequency(changed.frequency);
+      }}
     >
       <Form.Item
         label="Habit Name"
